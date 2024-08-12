@@ -1,0 +1,14 @@
+[Unit]
+Description=Node Exporter Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/opt/prometheus/node_exporter-1.8.2.linux-amd64/node_exporter
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

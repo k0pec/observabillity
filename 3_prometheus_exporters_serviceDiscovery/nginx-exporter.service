@@ -1,0 +1,14 @@
+[Unit]
+Description=Node Exporter Service
+After=network.target
+
+[Service]
+User=nginx
+Group=nginx
+Type=simple
+ExecStart=/opt/prometheus/nginx-prometheus-exporter -nginx.scrape-uri=https://127.0.0.1/server-status
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
