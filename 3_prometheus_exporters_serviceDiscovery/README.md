@@ -4,6 +4,7 @@ server1:
 2. NodeExporter
 3. MySQLExporter
 4. NginxExporter
+5. Nginx (SSL\TLS + Proxy)
 
 server2:
 1. Prometheus
