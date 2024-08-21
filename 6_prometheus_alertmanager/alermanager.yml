@@ -1,0 +1,41 @@
+global:
+ resolve_timeout: 5m
+ telegram_api_url: "https://api.telegram.org"
+
+templates:
+  - '/opt/alermanager/alertmanager-0.27.0.linux-amd64/*.tmpl'
+
+receivers:
+ - name: "send-email"
+   email_configs:
+   - to: "alerts_observ@yandex.ru"
+     smarthost: "127.0.0.1:25"
+     require_tls: false
+     headers:
+       Subject: '{{ .Labels.instance }}'
+     html: '{{ template "message" . }}'
+ - name: telegram-test
+   telegram_configs:
+   - chat_id: "11111111"
+     bot_token: "6941051793:AAFcw9nzSuzs718vgMSa9JR02gNOy3aYSyQ"
+     api_url: "https://api.telegram.org"
+     send_resolved: true
+     parse_mode: HTML
+     message: '{{ template "message" . }}'
+
+
+route:
+  group_by: ['alertname', 'instance', 'severity']
+  group_wait: 15s
+  group_interval: 30s
+  repeat_interval: 12h
+  receiver: "telegram-test"
+  routes:
+  - receiver: "telegram-test"
+    continue: true
+    matchers:
+    - severity="critical"
+  - receiver: "send-email"
+    continue: true
+    matchers:
+    - severity="warning"

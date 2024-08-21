@@ -1,0 +1,22 @@
+groups:
+- name: NodeState
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down
+        for more than 1 minute.'
+      summary: Instance {{ $labels.instance }} down
+
+  - alert: InstanceCpu
+    expr: node_load1 > 0.9
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      description: '{{ $labels.instance }} of job {{ $labels.job }} node_load1 gt 0.9
+        for more than 1 minute.'
+      summary: Instance {{ $labels.instance }} node_load1 gt 0.9
