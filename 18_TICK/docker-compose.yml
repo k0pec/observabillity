@@ -1,0 +1,66 @@
+version: '3'
+services:
+  influxdb:
+    image: influxdb:2.7
+    restart: always
+    container_name: influxdb
+    hostname: influxdb
+    ports:
+      - 8086:8086
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: adminpassword
+      DOCKER_INFLUXDB_INIT_ORG: tick
+      DOCKER_INFLUXDB_INIT_BUCKET: tick
+      DOCKER_INFLUXDB_INIT_ADMIN_TOCKEN: mytokentick
+    volumes:
+      - ./volumes/influxdb-config:/etc/influxdb2
+      - ./volumes/influxdb-data:/var/lib/influxdb2
+    networks:
+     - tick
+
+  chronograf:
+    image: chronograf:1.8-alpine
+    restart: always
+    container_name: chronograf
+    hostname: chronograf
+    ports:
+      - 8888:8888
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - KAPACITOR_URL=http://kapacitor:9092
+      - INFLUXDB_USERNAME=admin
+      - INFLUXDB_PASSWORD=mytokentick
+    volumes:
+      - ./volumes/chronograf:/var/lib/chronograf
+    depends_on:
+      - influxdb
+    networks:
+     - tick
+
+  kapacitor:
+    image: kapacitor:1.7-alpine
+    restart: always
+    container_name: kapacitor
+    hostname: kapacitor
+    ports:
+      - 9092:9092
+    environment:
+      KAPACITOR_HOSTNAME: kapacitor
+      KAPACITOR_INFLUXDB_0_URLS_0: "http://influxdb:8086"
+      KAPACITOR_INFLUXDB_ENABLED: "true"
+      KAPACITOR_HTTP_AUTH_ENABLED: "true"
+      KAPACITOR_INFLUXDB_0_USERNAME: admin
+      KAPACITOR_INFLUXDB_0_PASSWORD: mytokentick
+    volumes:
+      - ./volumes/kapacitor-config:/etc/kapacitor
+      - ./volumes/kapacitor-data:/var/lib/kapacitor
+    depends_on:
+      - influxdb
+    networks:
+     - tick
+ 
+networks:
+  tick:
+    external: true
