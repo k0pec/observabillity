@@ -1,0 +1,10 @@
+[sources.nginx_file]
+  type                          = "file"
+  include                       = [ "/var/log/nginx/access.json.log" ]
+  start_at_beginning            = false
+  fingerprinting.strategy       = "device_and_inode"
+
+[sinks.nginx_output_vector]
+  type                          = "vector"
+  inputs                        = [ "nginx_file" ]
+  address                       = "192.168.0.117:9876"
