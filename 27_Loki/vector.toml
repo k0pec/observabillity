@@ -1,0 +1,15 @@
+[sources.nginx_input_vector]
+type = "file"
+include = [ "/var/log/nginx/access.json.log" ]
+start_at_beginning = false
+fingerprinting.strategy = "device_and_inode"
+
+
+[sinks.nginx_output_loki]
+type = "loki"
+inputs = ["nginx_input_vector"]
+healthcheck = true
+compression = "none"
+encoding.codec = "raw_message"
+labels.vector = "vector-%Y-%m-%d"
+endpoint = "http://192.168.152.137:3100"
